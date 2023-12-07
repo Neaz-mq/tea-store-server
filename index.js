@@ -31,7 +31,26 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-   
+
+    const teaCollection = client.db('teaDB').collection('tea');
+
+
+    app.get('/tea', async (req, res) => {
+      const cursor = teaCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+
+  })
+
+    app.post('/tea', async (req, res) => {
+
+      const newTea = req.body;
+      console.log(newTea);
+
+      const result = await teaCollection.insertOne(newTea);
+      res.send(result);
+
+  })
     // Send a ping to confirm a successful connection
     
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
