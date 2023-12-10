@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -40,7 +40,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
 
-  })
+    })
 
     app.post('/tea', async (req, res) => {
 
@@ -50,9 +50,53 @@ async function run() {
       const result = await teaCollection.insertOne(newTea);
       res.send(result);
 
-  })
+    })
+
+    app.delete('/tea/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await teaCollection.deleteOne(query);
+      res.send(result);
+    })
+
+
+    app.get('/tea/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await teaCollection.findOne(query);
+      res.send(result);
+
+
+    })
+
+
+    app.put('/tea/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedTea = req.body;
+      const tea = {
+        $set: {
+          name: updatedTea.name,
+          quantity: updatedTea.quantity,
+          supplier: updatedTea.supplier,
+          taste: updatedTea.taste,
+          category: updatedTea.category,
+          details: updatedTea.details,
+          photo: updatedTea.photo
+        },
+      }
+      const result = await teaCollection.updateOne(filter, tea, options);
+      res.send(result);
+
+    })
+
+
+
+
+
     // Send a ping to confirm a successful connection
-    
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
@@ -64,9 +108,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Tea making server is running')
+  res.send('Tea making server is running')
 })
 
 app.listen(port, () => {
-    console.log(`Tea Server is running on port: ${port}`);
+  console.log(`Tea Server is running on port: ${port}`);
 })
