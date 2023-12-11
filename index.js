@@ -33,6 +33,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
 
     const teaCollection = client.db('teaDB').collection('tea');
+    const userCollection = client.db('teaDB').collection('user');
 
 
     app.get('/tea', async (req, res) => {
@@ -92,6 +93,14 @@ async function run() {
     })
 
 
+    // user related apis
+
+    app.post('/user', async(req, res) =>{
+      const user = req.body;
+      console.log(user);
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+  })
 
 
 
